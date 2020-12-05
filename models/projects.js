@@ -34,7 +34,7 @@ const pieceSchema = new Schema({
   index: {
     type: Number
   },
-  onShow: {
+  showInProj: {
     type: Boolean,
     default: true
   }

@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
     index
   })
   for (piece of req.body.pieces) {
-    const { isMain, imgURL, pieceDescription, price, size, pieceYear, materials } = piece
+    const { isMain, imgURL, pieceDescription, price, size, pieceYear, materials, showInProj } = piece
     const newPiece = {
       project,
       isMain,
@@ -30,14 +30,13 @@ router.post('/', async (req, res) => {
       size,
       materials,
       year: pieceYear,
-      index: 0
+      index: 0,
+      showInProj
     }
     project.pieces.push(newPiece)
   }
-  // await project.save()
-  console.log(project)
-
-  // res.json(project)
+  await project.save()
+  res.json(project)
 })
 
 module.exports = router
