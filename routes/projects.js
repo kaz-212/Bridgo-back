@@ -1,26 +1,43 @@
 const express = require('express')
 const router = express.Router()
 const Project = require('../models/projects')
-const Piece = require('../models/pieces')
 
 router.get('/', (req, res) => {
-  console.log(req.body)
-  Project.find()
+  console.log(req.body, 'get')
+  Project.find({})
     .sort({ index: 1 })
     .then(projects => res.json(projects))
 })
 
 router.post('/', async (req, res) => {
-  const { name, description, year, index } = req.body
+  // console.log('POST', req.body)
+  const { name, description, year } = req.body.project
+  const index = await Project.countDocuments()
   const project = new Project({
     name,
     description,
     year,
     index
   })
-  await project.save()
-  console.log('Success')
-  res.json(project)
+  for (piece of req.body.pieces) {
+    const { isMain, imgURL, pieceDescription, price, size, pieceYear, materials } = piece
+    const newPiece = {
+      project,
+      isMain,
+      imgURL,
+      description: pieceDescription,
+      price,
+      size,
+      materials,
+      year: pieceYear,
+      index: 0
+    }
+    project.pieces.push(newPiece)
+  }
+  // await project.save()
+  console.log(project)
+
+  // res.json(project)
 })
 
 module.exports = router

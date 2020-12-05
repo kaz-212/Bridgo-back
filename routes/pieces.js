@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
 // })
 
 router.post('/', async (req, res) => {
-  const { project, isMain, imgURL, description, price, size, year, index } = req.body
+  const { project, isMain, imgURL, description, price, size, year, materials } = req.body.pieces
   const piece = new Piece({
     project,
     isMain,
@@ -21,8 +21,8 @@ router.post('/', async (req, res) => {
     description,
     price,
     size,
-    year,
-    index
+    materials,
+    year
   })
   await piece.save()
   res.json(piece)

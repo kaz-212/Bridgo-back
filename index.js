@@ -4,8 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
-const ProjectPiece = require('./models/pieces')
-const Project = require('./models/projects')
+const cors = require('cors')
 
 const project = require('./routes/projects.js')
 
@@ -28,6 +27,8 @@ db.once('open', () => {
 
 // middleware
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(cors())
 
 // routes
 app.use('/api/projects', project)
