@@ -11,9 +11,10 @@ router.get('/', (req, res) => {
     .then(projects => res.json(projects))
 })
 
-router.post('/', async (req, res) => {
-  console.log('POST', req.body)
-  // const { name, description, year } = req.body.project
+router.post('/', upload.single('img'), async (req, res) => {
+  const project = JSON.parse(req.body.project)
+  const { name, description, year } = project
+  console.log(name, description, year)
   // const index = await Project.countDocuments()
   // const project = new Project({
   //   name,
