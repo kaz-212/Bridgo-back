@@ -2,14 +2,17 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const pieceSchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  },
   isMain: {
     type: Boolean,
     required: true
   },
   imgURL: {
     type: String,
-    required: true,
-    filename: String
+    required: true
   },
   description: {
     type: String,
@@ -32,11 +35,17 @@ const pieceSchema = new Schema({
     required: true
   },
   index: {
-    type: Number
+    type: Number,
+    required: true,
+    unique: true
   },
   showInProj: {
     type: Boolean,
     default: true
+  },
+  filename: {
+    type: String,
+    unique: true
   }
 })
 
