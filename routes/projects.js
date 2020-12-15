@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Project = require('../models/projects')
 const multer = require('multer')
-const { storage } = require('../cloudinary')
+const { storage, cloudinary } = require('../cloudinary')
 const upload = multer({ storage })
 
 router.get('/', (req, res) => {
@@ -54,6 +54,27 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   console.log(newProject)
   await newProject.save()
   res.status(200).json(newProject)
+})
+
+router.patch('/:id/edit', async (req, res) => {
+  console.log(req.body)
+  const { id } = req.params
+  const { project, filenames } = req.body
+  const updatedProject = await Project.findByIdAndUpdate(id, project, { new: true })
+  for (filename of filenames) {
+    await cloudinary.uploader.destroy(filename)
+  }
+  // // console.log(updatedProject)
+  res.status(200).json(updatedProject)
+})
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params
+  const project = await Project.findByIdAndDelete(id)
+  for (piece of project.pieces) {
+    await cloudinary.uploader.destroy(piece.filename)
+  }
+  res.status(200).json(project)
 })
 
 module.exports = router
