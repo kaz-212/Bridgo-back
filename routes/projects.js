@@ -56,7 +56,8 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   res.status(200).json(newProject)
 })
 
-router.patch('/:id/edit', async (req, res) => {
+// for editing entire project
+router.put('/:id', async (req, res) => {
   console.log(req.body)
   const { id } = req.params
   const { project, filenames } = req.body
@@ -66,6 +67,19 @@ router.patch('/:id/edit', async (req, res) => {
   }
   // // console.log(updatedProject)
   res.status(200).json(updatedProject)
+})
+
+//  for adding a piece to project
+router.patch('/:id', upload.single('img'), async (req, res) => {
+  const { id } = req.params
+  const piece = JSON.parse(req.body.piece)
+  const project = await Project.findById(id)
+  const { pieceName, isMain, pieceDescription, price, size, pieceYear, materials, showInProj, index } = piece
+  let pieceIndex = parseInt(project.index.toString() + index.toString())
+  const imgURL = req.file.path
+  const filename = req.file.filename
+
+  console.log(JSON.parse(req.body.piece))
 })
 
 router.delete('/:id', async (req, res) => {
