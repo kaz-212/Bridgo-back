@@ -78,8 +78,24 @@ router.patch('/:id', upload.single('img'), async (req, res) => {
   let pieceIndex = parseInt(project.index.toString() + index.toString())
   const imgURL = req.file.path
   const filename = req.file.filename
-
-  console.log(JSON.parse(req.body.piece))
+  const newPiece = {
+    name: pieceName,
+    project,
+    isMain,
+    description: pieceDescription,
+    price,
+    size,
+    materials,
+    year: pieceYear,
+    index: pieceIndex,
+    showInProj,
+    imgURL,
+    filename
+  }
+  project.pieces.push(newPiece)
+  await project.save()
+  console.log(project)
+  res.status(200).json(newPiece)
 })
 
 router.delete('/:id', async (req, res) => {
