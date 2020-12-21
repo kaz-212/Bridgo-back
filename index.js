@@ -8,6 +8,7 @@ const cors = require('cors')
 const history = require('connect-history-api-fallback')
 
 const project = require('./routes/projects.js')
+const exhibition = require('./routes/exhibitions.js')
 
 // mongoose
 
@@ -34,6 +35,7 @@ app.use(history())
 
 // routes
 app.use('/api/projects', project)
+app.use('/api/exhibitions', exhibition)
 
 const port = process.env.PORT || 5000
 
