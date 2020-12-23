@@ -5,7 +5,15 @@ const multer = require('multer')
 const { storage, cloudinary } = require('../cloudinary')
 const upload = multer({ storage })
 
-router.get('/', (req, res) => {})
+router.get('/', async (req, res) => {
+  // console.log('geto')
+  const exhibitions = await Exhibition.find({}).sort({ index: 1 })
+  res.status(200).json(exhibitions)
+})
+
+router.patch('/', (req, res) => {
+  console.log('patchy')
+})
 
 router.post('/', upload.array('imgs'), async (req, res) => {
   const exhibition = JSON.parse(req.body.exhibition)
@@ -22,8 +30,17 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   console.log(newExhibition)
   const completed = await newExhibition.save()
 
-  // console.log(newExhibition)
   res.status(200).json(completed)
+})
+
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params
+  const exhibition = await Exhibition.findByIdAndDelete(id)
+  for (img of exhibition.images) {
+    await cloudinary.uploader.destroy(img.filename)
+  }
+  console.log('deleto')
+  res.status(200).json(exhibition)
 })
 
 module.exports = router

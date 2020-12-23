@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const ImageSchema = new Schema({
+const imageSchema = new Schema({
   imgURL: {
     type: String,
     required: true
@@ -13,7 +13,11 @@ const ImageSchema = new Schema({
   }
 })
 
-const ExhibitionSchema = new Schema({
+imageSchema.virtual('thumbnail').get(function () {
+  return this.imgURL.replace('/upload', '/upload/w_200')
+})
+
+const exhibitionSchema = new Schema({
   name: {
     type: String,
     required: true
@@ -41,7 +45,13 @@ const ExhibitionSchema = new Schema({
     unique: true,
     required: true
   },
-  images: [ImageSchema]
+  links: [
+    {
+      name: String,
+      URL: String
+    }
+  ],
+  images: [imageSchema]
 })
 
-module.exports = mongoose.model('Exhibition', ExhibitionSchema)
+module.exports = mongoose.model('Exhibition', exhibitionSchema)

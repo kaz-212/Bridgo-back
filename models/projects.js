@@ -58,7 +58,7 @@ pieceSchema.virtual('thumbnail').get(function () {
   return this.imgURL.replace('/upload', '/upload/w_250')
 })
 
-const ProjectSchema = new Schema({
+const projectSchema = new Schema({
   name: {
     type: String,
     required: true
@@ -82,4 +82,4 @@ const ProjectSchema = new Schema({
   pieces: [pieceSchema]
 })
 
-module.exports = mongoose.model('Project', ProjectSchema)
+module.exports = mongoose.model('Project', projectSchema)
