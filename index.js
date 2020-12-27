@@ -5,6 +5,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
 const cors = require('cors')
+const morgan = require('morgan')
 const history = require('connect-history-api-fallback')
 
 const project = require('./routes/projects.js')
@@ -32,6 +33,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(cors())
 app.use(history())
+app.use(morgan('dev'))
 
 // routes
 app.use('/api/projects', project)

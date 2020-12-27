@@ -6,7 +6,6 @@ const { storage, cloudinary } = require('../cloudinary')
 const upload = multer({ storage })
 
 router.get('/', (req, res) => {
-  console.log(req.body, 'get')
   Project.find({})
     .sort({ index: 1 })
     .then(projects => res.json(projects))
@@ -65,7 +64,6 @@ router.put('/:id', async (req, res) => {
   for (filename of filenames) {
     await cloudinary.uploader.destroy(filename)
   }
-  // // console.log(updatedProject)
   res.status(200).json(updatedProject)
 })
 
