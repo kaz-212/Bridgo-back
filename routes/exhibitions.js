@@ -11,13 +11,9 @@ router.get('/', async (req, res) => {
   res.status(200).json(exhibitions)
 })
 
-router.patch('/', (req, res) => {
-  console.log('patchy')
-})
-
 router.post('/', upload.array('imgs'), async (req, res) => {
   const exhibition = JSON.parse(req.body.exhibition)
-  // console.log(req.files)
+  console.log('yoyo', exhibition)
   const index = await Exhibition.countDocuments()
   exhibition.index = index
   const newExhibition = new Exhibition(exhibition)
@@ -39,8 +35,25 @@ router.delete('/:id', async (req, res) => {
   for (img of exhibition.images) {
     await cloudinary.uploader.destroy(img.filename)
   }
-  console.log('deleto')
   res.status(200).json(exhibition)
+})
+
+router.put('/:id', upload.array('imgs'), async (req, res) => {
+  const { id } = req.params
+  const exhibition = JSON.parse(req.body.exhibition)
+  const filenames = JSON.parse(req.body.filenames)
+  for (const img of req.files) {
+    let image = {}
+    image.imgURL = img.path
+    image.filename = img.filename
+    exhibition.images.push(image)
+  }
+  const editedExhibition = await Exhibition.findByIdAndUpdate(id, exhibition, { new: true })
+  for (const img of filenames) {
+    await cloudinary.uploader.destroy(img)
+  }
+  console.log(editedExhibition)
+  // res.status(200).json(editedExhibition)
 })
 
 module.exports = router

@@ -1,17 +1,22 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-const imageSchema = new Schema({
-  imgURL: {
-    type: String,
-    required: true
+const opts = { toJSON: { virtuals: true } }
+
+const imageSchema = new Schema(
+  {
+    imgURL: {
+      type: String,
+      required: true
+    },
+    filename: {
+      type: String,
+      unique: true,
+      required: true
+    }
   },
-  filename: {
-    type: String,
-    unique: true,
-    required: true
-  }
-})
+  opts
+)
 
 imageSchema.virtual('thumbnail').get(function () {
   return this.imgURL.replace('/upload', '/upload/w_200')
