@@ -17,7 +17,7 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   const index = await Exhibition.countDocuments()
   exhibition.index = index
   const newExhibition = new Exhibition(exhibition)
-  for (let img of req.files) {
+  for (const img of req.files) {
     let image = {}
     image.imgURL = img.path
     image.filename = img.filename
@@ -32,16 +32,18 @@ router.post('/', upload.array('imgs'), async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const { id } = req.params
   const exhibition = await Exhibition.findByIdAndDelete(id)
-  for (img of exhibition.images) {
+  console.log(exhibition.images)
+  for (const img of exhibition.images) {
     await cloudinary.uploader.destroy(img.filename)
   }
   res.status(200).json(exhibition)
 })
 
+// need to sort out deleting images
+
 router.put('/:id', upload.array('imgs'), async (req, res) => {
   const { id } = req.params
   const exhibition = JSON.parse(req.body.exhibition)
-  const filenames = JSON.parse(req.body.filenames)
   for (const img of req.files) {
     let image = {}
     image.imgURL = img.path
@@ -49,11 +51,12 @@ router.put('/:id', upload.array('imgs'), async (req, res) => {
     exhibition.images.push(image)
   }
   const editedExhibition = await Exhibition.findByIdAndUpdate(id, exhibition, { new: true })
+  const filenames = JSON.parse(req.body.filenames)
   for (const img of filenames) {
+    console.log(img)
     await cloudinary.uploader.destroy(img)
   }
-  console.log(editedExhibition)
-  // res.status(200).json(editedExhibition)
+  res.status(200).json(editedExhibition)
 })
 
 module.exports = router
