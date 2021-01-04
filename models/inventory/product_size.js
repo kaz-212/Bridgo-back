@@ -2,6 +2,18 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const 
 
+const sizePriceSchema = new Schema({
+  size_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'Size',
+    required:true
+  },
+  price: {
+    type: Number,
+    required:true
+  }
+})
+
 const particularSchema = new Schema({
   size: {
     type: String,
@@ -17,15 +29,8 @@ const particularSchema = new Schema({
     ref: 'Product',
     required:true
   },
-  size_id: {
-    type: Schema.Types.ObjectId,
-    ref: 'Size',
-    required:true
-  },
-  price: {
-    type: Number,
-    required:true
-  }
+  size_price: [sizePriceSchema]
+  
 })
 
 module.exports = mongoose.model('Particular', particularSchema)
