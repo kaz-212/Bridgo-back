@@ -42,6 +42,7 @@ router.post('/', upload.array('imgs'), async (req, res) => {
     sizeInfo.size = currentSize
     sizeInfo.price = parseFloat(size.price)
     sizeInfo.qty = parseInt(size.qty)
+    sizeInfo.index = parseInt(size.index)
     particular.size_price_qty.push(sizeInfo)
   }
 
