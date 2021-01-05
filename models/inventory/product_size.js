@@ -18,7 +18,8 @@ const sizePriceQtySchema = new Schema({
   },
   index: {
     type: Number,
-    required: true
+    required: true,
+    default: 0
   }
 })
 

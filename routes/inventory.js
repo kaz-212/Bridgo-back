@@ -7,8 +7,12 @@ const multer = require('multer')
 const { storage, cloudinary } = require('../cloudinary')
 const upload = multer({ storage })
 
-router.get('/', (req, res) => {
-  console.log('hello')
+router.get('/', async (req, res) => {
+  await Particular.find(async (err, particular) => {
+    const opts = [{ path: 'product' }, { path: 'size_price_qty.size', select: 'size' }]
+    const populatedParticulars = await Particular.populate(particular, opts)
+    res.send(populatedParticulars)
+  })
 })
 
 router.post('/', upload.array('imgs'), async (req, res) => {
@@ -42,7 +46,7 @@ router.post('/', upload.array('imgs'), async (req, res) => {
     sizeInfo.size = currentSize
     sizeInfo.price = parseFloat(size.price)
     sizeInfo.qty = parseInt(size.qty)
-    sizeInfo.index = parseInt(size.index)
+    size.index ? (sizeInfo.index = parseInt(size.index)) : (sizeInfo.index = 0)
     particular.size_price_qty.push(sizeInfo)
   }
 
