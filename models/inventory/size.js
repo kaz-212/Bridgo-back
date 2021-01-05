@@ -5,7 +5,13 @@ const sizeSchema = new Schema({
   size: {
     type: String,
     required: true
-  }
+  },
+  products: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Product'
+    }
+  ]
 })
 
 module.exports = mongoose.model('Size', sizeSchema)

@@ -13,6 +13,11 @@ const imgSchema = new Schema(
       type: String,
       unique: true,
       required: true
+    },
+    isMain: {
+      required: true,
+      default: false,
+      type: Boolean
     }
   },
   opts

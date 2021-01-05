@@ -10,6 +10,7 @@ const history = require('connect-history-api-fallback')
 
 const project = require('./routes/projects.js')
 const exhibition = require('./routes/exhibitions.js')
+const inventory = require('./routes/inventory.js')
 
 // mongoose
 
@@ -38,6 +39,7 @@ app.use(morgan('dev'))
 // routes
 app.use('/api/projects', project)
 app.use('/api/exhibitions', exhibition)
+app.use('/api/inventory', inventory)
 
 const port = process.env.PORT || 5000
 
