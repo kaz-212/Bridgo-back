@@ -30,7 +30,6 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   await newProduct.save()
 
   const particular = new Particular({ product: newProduct })
-  const particulars = []
 
   for (const size of sizes) {
     const currentSize = await Size.findOneAndUpdate(
@@ -41,7 +40,7 @@ router.post('/', upload.array('imgs'), async (req, res) => {
     // for each size (and price), create new particular (product with size, price, quantity)
     let sizeInfo = {}
     sizeInfo.size = currentSize
-    sizeInfo.price = parseInt(parseFloat(size.price) * 100)
+    sizeInfo.price = parseFloat(size.price)
     sizeInfo.qty = parseInt(size.qty)
     particular.size_price_qty.push(sizeInfo)
   }
@@ -52,6 +51,7 @@ router.post('/', upload.array('imgs'), async (req, res) => {
     if (err) {
       return console.log(err)
     }
+    // sends the particular (which is the product with an array of sizes/prices/quantities)
     res.json(doc)
   })
 })
