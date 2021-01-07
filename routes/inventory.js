@@ -61,4 +61,14 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   })
 })
 
+router.put('/:id', upload.array('imgs'), (req, res) => {
+  const particular = JSON.parse(req.body.particular)
+  const sizes = JSON.parse(req.body.sizes)
+  // add any new images to particular.product.images
+  // update product with particular.product
+  // product section done
+  //
+  console.log(particular, sizes)
+})
+
 module.exports = router
