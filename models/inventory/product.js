@@ -42,6 +42,15 @@ const productSchema = new Schema({
     type: String,
     enum: ['print', 'piece', 'other'],
     required: true
+  },
+  onShow: {
+    type: Boolean,
+    required: true,
+    default: true
+  },
+  order: {
+    type: Number,
+    required: true
   }
 })
 
