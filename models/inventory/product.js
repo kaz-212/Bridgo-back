@@ -11,7 +11,7 @@ const imgSchema = new Schema(
         },
         filename: {
             type: String,
-            unique: true,
+            // unique: true,
             required: true
         },
         isMain: {

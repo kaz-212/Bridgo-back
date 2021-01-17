@@ -61,14 +61,23 @@ router.post('/', upload.array('imgs'), async (req, res) => {
     })
 })
 
-router.put('/:id', upload.array('imgs'), (req, res) => {
-    const particular = JSON.parse(req.body.particular)
-    const sizes = JSON.parse(req.body.sizes)
-    // add any new images to particular.product.images
-    // update product with particular.product
-    // product section done
-    //
-    console.log(particular, sizes)
+router.put('/product/:id', upload.array('imgs'), async (req, res) => {
+    const product = JSON.parse(req.body.product)
+    const filenames = JSON.parse(req.body.filenames) // to del
+    for (let i = 0; i < req.files.length; i++) {
+        let image = {}
+        image.imgURL = req.files[i].path
+        image.filename = req.files[i].filename
+        if (!product.images.length & (i === 0)) {
+            image.isMain = true // default is false
+        }
+        product.images.push(image)
+    }
+    editedProduct = await Product.findByIdAndUpdate(product._id, product, { new: true })
+    for (const filename of filenames) {
+        await cloudinary.uploader.destroy(filename)
+    }
+    res.json(editedProduct)
 })
 
 router.delete('/:id', async (req, res) => {
