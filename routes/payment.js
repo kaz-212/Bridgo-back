@@ -23,17 +23,24 @@ router.post('/', async (req, res) => {
     const { items } = req.body
     const amount = await calculatePrice(items)
 
+    // if we already have a payment intent created, update the amount of the old one every time checkout page loads
     if (req.cookies.intent) {
         const oldIntent = JSON.parse(req.cookies.intent)
-        const intent = await stripe.paymentIntents.retrieve(oldIntent.client_secret)
+        // regex searching until second '_' gives us id
+        const re = /[^_]*_[^_]*/
+        const id = re.exec(oldIntent.client_secret)
+        const intent = await stripe.paymentIntents.update(id[0], {
+            amount
+        })
         console.log(intent)
+        res.send(intent)
     } else {
         // TODO if price == NAN => throw an error
         const intent = await stripe.paymentIntents.create({
             amount,
             currency: 'gbp'
         })
-        res.json({ client_secret: intent.client_secret, amount, id: intent.id })
+        res.json({ client_secret: intent.client_secret, amount })
     }
 })
 
