@@ -22,6 +22,7 @@ const calculatePrice = async items => {
 router.post('/', async (req, res) => {
     const { items } = req.body
     const amount = await calculatePrice(items)
+    // TODO create a function that checks qty available and throw err if not.
 
     // if we already have a payment intent created, update the amount of the old one every time checkout page loads
     if (req.cookies.intent) {
@@ -40,6 +41,7 @@ router.post('/', async (req, res) => {
             amount,
             currency: 'gbp'
         })
+        console.log(intent)
         res.json({ client_secret: intent.client_secret, amount })
     }
 })
