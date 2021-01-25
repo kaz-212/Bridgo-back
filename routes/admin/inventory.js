@@ -8,23 +8,29 @@ const { storage, cloudinary } = require('../../cloudinary')
 const upload = multer({ storage })
 
 // router.get('/', async (req, res) => {
-//   await Particular.find(async (err, particular) => {
-//     const opts = [{ path: 'product' }, { path: 'size_price_qty.size', select: 'size' }]
-//     const populatedParticulars = await Particular.populate(particular, opts)
-//     res.send(populatedParticulars)
+//   await Product.find(async (err, product) => {
+//     const opts = [
+//       { path: 'particulars' },
+//       { path: 'particulars', select: 'size' }
+//       // { path: 'particulars', select: 'orders' }
+//     ]
+//     const populatedProducts = await Product.populate(product, opts)
+//     for (const item of populatedProducts) {
+//       console.log(item.particulars)
+//     }
+//     res.send(populatedProducts)
 //   })
 // })
 
 router.get('/', async (req, res) => {
-  await Product.find(async (err, product) => {
-    const opts = [
-      { path: 'particulars' },
-      { path: 'particulars', select: 'size' },
-      { path: 'particulars', select: 'orders' }
+  const products = await Product.find({}).populate({
+    path: 'particulars',
+    populate: [
+      { path: 'size', select: 'name' }
+      // { path: 'orders' } // TODO uncomment when we add orders
     ]
-    const populatedProducts = await Product.populate(product, opts)
-    res.send(populatedProducts)
   })
+  res.json(products)
 })
 
 router.post('/', upload.array('imgs'), async (req, res) => {
@@ -44,25 +50,6 @@ router.post('/', upload.array('imgs'), async (req, res) => {
     newProduct.images.push(image)
   }
 
-  // const particular = new Particular({ product: newProduct })
-
-  // for (const size of details) {
-  //   const currentSize = await Size.findOneAndUpdate(
-  //     { size: size.size }, // to lowercase in setter
-  //     { $push: { products: newProduct._id } },
-  //     { upsert: true, new: true } // if size doesnt exist, creates new document
-  //   )
-  //   // for each size (and price), create new particular (product with size, price, quantity)
-  //   let sizeInfo = {}
-  //   sizeInfo.size = currentSize
-  //   sizeInfo.price = parseFloat(size.price)
-  //   sizeInfo.qty = parseInt(size.qty)
-  //   size.index ? (sizeInfo.index = parseInt(size.index)) : (sizeInfo.index = 0)
-  //   particular.size_price_qty.push(sizeInfo)
-  // }
-
-  // await particular.save()
-
   for (const detail of details) {
     // find or create size
     const currentSize = await Size.findOneAndUpdate(
@@ -80,19 +67,30 @@ router.post('/', upload.array('imgs'), async (req, res) => {
     })
     // add particular to the products array
     const savedParticular = await particular.save()
-    newProduct.particulars.push(savedParticular)
-    console.log(savedParticular)
+    newProduct.particulars.push(savedParticular._id)
   }
 
   const savedProduct = await newProduct.save()
-  console.log(savedProduct)
+  savedProduct.populate(
+    {
+      path: 'particulars',
+      populate: [{ path: 'size', select: 'name' }]
+    },
+    (err, doc) => {
+      if (err) {
+        return console.log(err)
+      }
+      res.json(doc)
+    }
+  )
+  // console.log(savedProduct)
 
   // particular.populate([{ path: 'product' }, { path: 'size_price_qty.size', select: 'size' }], (err, doc) => {
   //   if (err) {
   //     return console.log(err)
   //   }
   // sends the particular (which is the product with an array of sizes/prices/quantities)
-  res.json(savedProduct)
+  // res.json(savedProduct)
 })
 
 router.put('/product/:id', upload.array('imgs'), async (req, res) => {

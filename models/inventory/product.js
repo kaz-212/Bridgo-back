@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
+const Particular = require('./particular')
 
 const opts = { toJSON: { virtuals: true } }
 
