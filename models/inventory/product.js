@@ -52,10 +52,12 @@ const productSchema = new Schema({
     type: Number
     // required: true
   },
-  particulars: {
-    type: Schema.Types.ObjectId,
-    ref: 'Particular'
-  }
+  particulars: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Particular'
+    }
+  ]
 })
 
 module.exports = mongoose.model('Product', productSchema)
