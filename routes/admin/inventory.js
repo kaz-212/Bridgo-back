@@ -17,7 +17,11 @@ const upload = multer({ storage })
 
 router.get('/', async (req, res) => {
   await Product.find(async (err, product) => {
-    const opts = [{ path: 'particulars' }, { path: 'particulars', select: 'size' }]
+    const opts = [
+      { path: 'particulars' },
+      { path: 'particulars', select: 'size' },
+      { path: 'particulars', select: 'orders' }
+    ]
     const populatedProducts = await Product.populate(product, opts)
     res.send(populatedProducts)
   })
@@ -112,23 +116,24 @@ router.put('/product/:id', upload.array('imgs'), async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   const { id } = req.params
-  const particular = await Particular.findByIdAndDelete(id)
-  const product = await Product.findByIdAndDelete(particular.product._id)
-  //  delete product from array of products associated with each size
-  for (const size of particular.size_price_qty) {
-    const sizeId = size.size
+  const product = await Product.findByIdAndDelete(id)
+  // delete particulars from particular array
+  for (const particularId of product.particulars) {
+    // delete product from array of products associated with each size
+    const particular = await Particular.findByIdAndDelete(particularId)
+    const sizeId = particular.size._id
     const foundSize = await Size.findById(sizeId)
     const newProdArray = foundSize.products.filter(prod => !prod.equals(product._id))
-    // if no more products associateed with size then delete the size
     if (!newProdArray.length) {
       await Size.findByIdAndDelete(sizeId)
     } else {
       foundSize.products = newProdArray
       await foundSize.save()
     }
-    for (const image of product.images) {
-      await cloudinary.uploader.destroy(image.filename)
-    }
+  }
+  // delete images from cloudinary
+  for (const image of product.images) {
+    await cloudinary.uploader.destroy(image.filename)
   }
   res.send(id)
 })
