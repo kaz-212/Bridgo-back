@@ -7,21 +7,6 @@ const multer = require('multer')
 const { storage, cloudinary } = require('../../cloudinary')
 const upload = multer({ storage })
 
-// router.get('/', async (req, res) => {
-//   await Product.find(async (err, product) => {
-//     const opts = [
-//       { path: 'particulars' },
-//       { path: 'particulars', select: 'size' }
-//       // { path: 'particulars', select: 'orders' }
-//     ]
-//     const populatedProducts = await Product.populate(product, opts)
-//     for (const item of populatedProducts) {
-//       console.log(item.particulars)
-//     }
-//     res.send(populatedProducts)
-//   })
-// })
-
 router.get('/', async (req, res) => {
   const products = await Product.find({}).populate({
     path: 'particulars',
@@ -74,7 +59,7 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   savedProduct.populate(
     {
       path: 'particulars',
-      populate: [{ path: 'size', select: 'name' }]
+      populate: { path: 'size', select: 'name' }
     },
     (err, doc) => {
       if (err) {
@@ -83,14 +68,6 @@ router.post('/', upload.array('imgs'), async (req, res) => {
       res.json(doc)
     }
   )
-  // console.log(savedProduct)
-
-  // particular.populate([{ path: 'product' }, { path: 'size_price_qty.size', select: 'size' }], (err, doc) => {
-  //   if (err) {
-  //     return console.log(err)
-  //   }
-  // sends the particular (which is the product with an array of sizes/prices/quantities)
-  // res.json(savedProduct)
 })
 
 router.put('/product/:id', upload.array('imgs'), async (req, res) => {
@@ -109,7 +86,58 @@ router.put('/product/:id', upload.array('imgs'), async (req, res) => {
   for (const filename of filenames) {
     await cloudinary.uploader.destroy(filename)
   }
-  res.json(editedProduct)
+  editedProduct.populate(
+    {
+      path: 'particulars',
+      populate: { path: 'size', select: 'name' }
+    },
+    (err, doc) => {
+      if (err) {
+        return console.log(err)
+      }
+      res.json(doc)
+    }
+  )
+})
+
+router.put('/particular/:id', async (req, res) => {
+  const { id } = req.params
+  const particular = req.body
+  const oldParticular = await Particular.findById(id).populate('size')
+  // check if size has changed
+  if (particular.size.name !== oldParticular.size.name) {
+    // rm product from size array and delete if necessary
+    await Size.findByIdAndUpdate(
+      oldParticular.size._id,
+      {
+        $pullAll: { products: [oldParticular.product] }
+      },
+      { new: true },
+      async (err, doc) => {
+        if (err) {
+          return console.log(err)
+        }
+        if (!doc.products.length) {
+          await Size.findByIdAndDelete(doc._id)
+        }
+      }
+    )
+    // check if new size exists and if not, add new size
+    const newSize = await Size.findOneAndUpdate(
+      { name: particular.size.name }, // to lowercase in setter
+      { $push: { products: particular.product } },
+      { upsert: true, new: true } // if size doesnt exist, creates new document
+    )
+    // add new size to particular
+    particular.size = newSize._id
+    const editedParticular = await Particular.findByIdAndUpdate(id, particular, { new: true }).populate('size') //TODO populate orders
+    return res.json(editedParticular)
+  } else {
+    // if the size name is the same
+    console.log(particular)
+    const editedParticular = await Particular.findByIdAndUpdate(id, particular, { new: true }).populate('size') //TODO populate orders
+    return res.json(editedParticular)
+  }
 })
 
 router.delete('/:id', async (req, res) => {

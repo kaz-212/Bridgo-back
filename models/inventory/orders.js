@@ -30,6 +30,10 @@ const orderSchema = new Schema({
       required: true
     }
   },
+  dateOrdered: {
+    type: Date,
+    required: true
+  },
   dispatched: {
     type: Boolean,
     default: false
