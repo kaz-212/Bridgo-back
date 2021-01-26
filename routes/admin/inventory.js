@@ -35,6 +35,7 @@ router.get('/', async (req, res) => {
   res.json(products)
 })
 
+// add product
 router.post('/', upload.array('imgs'), async (req, res) => {
   console.log('Joooo')
   const product = JSON.parse(req.body.product)
@@ -85,6 +86,25 @@ router.post('/', upload.array('imgs'), async (req, res) => {
       res.json(doc)
     }
   )
+})
+
+router.post('/particular', async (req, res) => {
+  const { productId, particular } = req.body
+  const size = await Size.findOneAndUpdate(
+    { name: particular.size }, // to lowercase in setter
+    { $push: { products: productId } },
+    { upsert: true, new: true } // if size doesnt exist, creates new document
+  )
+  const newParticular = new Particular({
+    product: productId,
+    price: parseFloat(particular.price),
+    unitsRemaining: particular.unitsRemaining,
+    unitsSold: particular.unitsSold,
+    size: size._id
+  })
+  const savedParticular = await newParticular.save()
+  const product = await Product.findByIdAndUpdate(productId, { $push: { particulars: savedParticular._id } })
+  res.json(product)
 })
 
 // edit product
