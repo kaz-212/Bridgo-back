@@ -103,7 +103,17 @@ router.post('/particular', async (req, res) => {
     size: size._id
   })
   const savedParticular = await newParticular.save()
-  const product = await Product.findByIdAndUpdate(productId, { $push: { particulars: savedParticular._id } })
+  const product = await Product.findByIdAndUpdate(
+    productId,
+    { $push: { particulars: savedParticular._id } },
+    { new: true }
+  ).populate({
+    path: 'particulars',
+    populate: [
+      { path: 'size', select: 'name' }
+      // { path: 'orders' } // TODO uncomment when we add orders
+    ]
+  })
   res.json(product)
 })
 
@@ -195,9 +205,20 @@ router.delete('/product/:id', async (req, res) => {
 router.delete('/particular/:id', async (req, res) => {
   const { id } = req.params
   const particular = await delParticular(id)
-  console.log(particular)
-  Product.findByIdAndUpdate(particular.product, { $pullAll: { particulars: [particular._id] } })
-  res.send(id)
+  // console.log(particular)
+  const product = await Product.findByIdAndUpdate(
+    particular.product,
+    { $pullAll: { particulars: [particular._id] } },
+    { new: true }
+  ).populate({
+    path: 'particulars',
+    populate: [
+      { path: 'size', select: 'name' }
+      // { path: 'orders' } // TODO uncomment when we add orders
+    ]
+  })
+
+  res.json(product)
 })
 
 module.exports = router
