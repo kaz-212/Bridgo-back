@@ -7,6 +7,23 @@ const multer = require('multer')
 const { storage, cloudinary } = require('../../cloudinary')
 const upload = multer({ storage })
 
+// functions
+const delParticular = async id => {
+  const particular = await Particular.findByIdAndDelete(id)
+  const sizeId = particular.size
+  const foundSize = await Size.findByIdAndUpdate(
+    sizeId,
+    { $pullAll: { products: [particular.product] } },
+    { new: true }
+  )
+  // if size has no associated products then delete size
+  if (!foundSize.products.length) {
+    await Size.findByIdAndDelete(foundSize._id)
+  }
+  return particular
+}
+
+// routes
 router.get('/', async (req, res) => {
   const products = await Product.find({}).populate({
     path: 'particulars',
@@ -70,6 +87,7 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   )
 })
 
+// edit product
 router.put('/product/:id', upload.array('imgs'), async (req, res) => {
   const product = JSON.parse(req.body.product)
   const filenames = JSON.parse(req.body.filenames) // to del
@@ -100,6 +118,7 @@ router.put('/product/:id', upload.array('imgs'), async (req, res) => {
   )
 })
 
+// edit particular
 router.put('/particular/:id', async (req, res) => {
   const { id } = req.params
   const particular = req.body
@@ -109,9 +128,7 @@ router.put('/particular/:id', async (req, res) => {
     // rm product from size array and delete if necessary
     await Size.findByIdAndUpdate(
       oldParticular.size._id,
-      {
-        $pullAll: { products: [oldParticular.product] }
-      },
+      { $pullAll: { products: [oldParticular.product] } },
       { new: true },
       async (err, doc) => {
         if (err) {
@@ -140,27 +157,26 @@ router.put('/particular/:id', async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/product/:id', async (req, res) => {
   const { id } = req.params
   const product = await Product.findByIdAndDelete(id)
   // delete particulars from particular array
   for (const particularId of product.particulars) {
     // delete product from array of products associated with each size
-    const particular = await Particular.findByIdAndDelete(particularId)
-    const sizeId = particular.size._id
-    const foundSize = await Size.findById(sizeId)
-    const newProdArray = foundSize.products.filter(prod => !prod.equals(product._id))
-    if (!newProdArray.length) {
-      await Size.findByIdAndDelete(sizeId)
-    } else {
-      foundSize.products = newProdArray
-      await foundSize.save()
-    }
+    delParticular(particularId)
   }
   // delete images from cloudinary
   for (const image of product.images) {
     await cloudinary.uploader.destroy(image.filename)
   }
+  res.send(id)
+})
+
+router.delete('/particular/:id', async (req, res) => {
+  const { id } = req.params
+  const particular = await delParticular(id)
+  console.log(particular)
+  Product.findByIdAndUpdate(particular.product, { $pullAll: { particulars: [particular._id] } })
   res.send(id)
 })
 
