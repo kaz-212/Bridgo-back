@@ -27,12 +27,6 @@ const particularSchema = new Schema({
     // required: true,
     // default: 0
   },
-  orders: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Order'
-    }
-  ],
   unitsSold: {
     type: Number,
     required: true,

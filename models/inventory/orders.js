@@ -6,32 +6,8 @@ const orderSchema = new Schema({
     type: String,
     required: true
   },
-  address: {
-    line1: {
-      type: String,
-      required: true
-    },
-    city: {
-      type: String,
-      required: true
-    },
-    postCode: {
-      type: String,
-      required: true
-    }
-  },
-  name: {
-    firstName: {
-      type: String,
-      required: true
-    },
-    lastName: {
-      type: String,
-      required: true
-    }
-  },
-  dateOrdered: {
-    type: Date,
+  orderId: {
+    type: String,
     required: true
   },
   dispatched: {
@@ -45,9 +21,25 @@ const orderSchema = new Schema({
     type: String
   },
   returned: {
-    type: Boolean,
-    default: false
-  }
+    isReturned: {
+      type: Boolean,
+      default: false
+    },
+    details: {
+      type: String
+    }
+  },
+  items: [
+    {
+      particular: {
+        type: Schema.Types.ObjectId,
+        ref: 'Particular'
+      },
+      qty: {
+        type: Number
+      }
+    }
+  ]
 })
 
 module.exports = mongoose.model('Order', orderSchema)

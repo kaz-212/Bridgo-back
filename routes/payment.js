@@ -1,7 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const Particular = require('../models/inventory/particular')
 const stripe = require('stripe')(process.env.STRIPE_SECRET)
+const { v4: uuidv4 } = require('uuid')
+
+const Order = require('../models/inventory/orders')
+const Particular = require('../models/inventory/particular')
 
 const calculatePrice = async items => {
   // calculate price based on particular id and quantity
@@ -19,12 +22,8 @@ const calculatePrice = async items => {
 router.post('/', async (req, res) => {
   const { items } = req.body
   const amount = await calculatePrice(items)
-  if (!req.session.views) {
-    req.session.views = 1
-  } else {
-    req.session.views++
-  }
-  console.log(req.session)
+  req.session.items = items
+  req.session.amount = amount
   if (typeof amount != 'object') {
     // if we already have a payment intent created, update the amount of the old one every time checkout page loads
     if (req.cookies.intent) {
@@ -39,9 +38,13 @@ router.post('/', async (req, res) => {
       res.json({ client_secret: intent.client_secret, amount })
     } else {
       // TODO if price == NAN => throw an error
+      const orderId = uuidv4()
       const intent = await stripe.paymentIntents.create({
         amount,
-        currency: 'gbp'
+        currency: 'gbp',
+        metadata: {
+          orderId
+        }
       })
       // console.log(intent)
       res.json({ client_secret: intent.client_secret, amount })
@@ -49,6 +52,36 @@ router.post('/', async (req, res) => {
   } else {
     res.json({ issue: amount })
   }
+})
+
+router.post('/process', async (req, res) => {
+  console.log(req.session)
+  const { receipt_email: email } = req.body
+  const intent = await stripe.paymentIntents.retrieve(req.body.id)
+  // create order based on details from paymentId
+  const order = new Order({
+    email: email,
+    orderId: intent.metadata.orderId
+  })
+  // console.log(req.session)
+
+  // for (const item of req.session.items) {
+  //   // update the value remainingvalue sold
+  //   const particular = await Particular.findByIdAndUpdate(
+  //     item.particular._id,
+  //     { $inc: { unitsRemaining: -item.qty, unitsSold: item.qty } },
+  //     { new: true }
+  //   )
+  //   const orderItem = {
+  //     particular: particular._id,
+  //     qty: item.qty
+  //   }
+  //   order.items.push(orderItem)
+  // }
+  // await order.save()
+  req.session.destroy()
+  req.session = null
+  res.send('success')
 })
 
 module.exports = router

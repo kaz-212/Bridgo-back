@@ -1,9 +1,9 @@
 let secure
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
-  secure = true
-} else {
   secure = false
+} else {
+  secure = true
 }
 const express = require('express')
 const app = express()
@@ -60,7 +60,7 @@ const sessionConfig = {
   cookie: {
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 7, // 7 hrs
-    secure: false
+    secure
   }
 }
 
