@@ -1,5 +1,9 @@
+let secure
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
+  secure = true
+} else {
+  secure = false
 }
 const express = require('express')
 const app = express()
@@ -9,6 +13,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const morgan = require('morgan')
 const history = require('connect-history-api-fallback')
+var session = require('express-session')
 
 const admin = require('./routes/admin')
 const project = require('./routes/projects.js')
@@ -37,12 +42,29 @@ db.once('open', () => {
 // cors
 const corsOpts = {
   origin: process.env.CORS_ORIGIN,
-  credentials: true
+  credentials: true,
+  exposedHeaders: ['set-cookie']
 }
 app.use(cors(corsOpts))
 
 // cookie parser
 app.use(cookieParser(process.env.COOKIE_SECRET_KEY))
+
+// express-session
+
+const sessionConfig = {
+  name: 'order',
+  secret: process.env.SESSION_SECRET_KEY,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 7, // 7 hrs
+    secure: false
+  }
+}
+
+app.use(session(sessionConfig))
 
 // other middleware
 app.use(express.urlencoded({ extended: true }))
