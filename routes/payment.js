@@ -65,23 +65,30 @@ router.post('/process', async (req, res) => {
   })
   // console.log(req.session)
 
-  // for (const item of req.session.items) {
-  //   // update the value remainingvalue sold
-  //   const particular = await Particular.findByIdAndUpdate(
-  //     item.particular._id,
-  //     { $inc: { unitsRemaining: -item.qty, unitsSold: item.qty } },
-  //     { new: true }
-  //   )
-  //   const orderItem = {
-  //     particular: particular._id,
-  //     qty: item.qty
-  //   }
-  //   order.items.push(orderItem)
-  // }
-  // await order.save()
-  req.session.destroy()
-  req.session = null
-  res.send('success')
+  for (const item of req.session.items) {
+    // update the value remainingvalue sold
+    const particular = await Particular.findByIdAndUpdate(
+      item.particular._id,
+      { $inc: { unitsRemaining: -item.qty, unitsSold: item.qty } },
+      { new: true }
+    )
+    const orderItem = {
+      particular: particular._id,
+      qty: item.qty
+    }
+    order.items.push(orderItem)
+  }
+  await order.save()
+  // delete session and remove on client side
+  req.session.destroy(err => {
+    if (err) {
+      console.log('ERROR', err)
+    } else {
+      req.session = null
+      res.clearCookie('order', { path: '/' })
+      return res.send('success')
+    }
+  })
 })
 
 module.exports = router
