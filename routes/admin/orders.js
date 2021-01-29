@@ -6,8 +6,14 @@ const Order = require('../../models/inventory/orders')
 router.get('/', async (req, res) => {
   const orders = await Order.find({}).populate({
     path: 'items',
-    select: 'particular'
+    populate: [
+      {
+        path: 'particular',
+        populate: [{ path: 'size', select: 'name' }]
+      }
+    ]
   })
+  console.log(orders[0].items)
   res.json(orders)
 })
 
