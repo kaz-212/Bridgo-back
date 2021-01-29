@@ -52,6 +52,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET_KEY))
 
 // express-session
 
+// TODO change session storage to propper storage
 const sessionConfig = {
   name: 'order',
   secret: process.env.SESSION_SECRET_KEY,

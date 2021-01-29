@@ -1,13 +1,14 @@
 const express = require('express')
 const router = express.Router()
-const Product = require('../../models/inventory/product')
-const Particular = require('../../models/inventory/particular')
-const Size = require('../../models/inventory/size')
 const multer = require('multer')
 const { storage, cloudinary } = require('../../cloudinary')
 const upload = multer({ storage })
 
-// functions
+const Product = require('../../models/inventory/product')
+const Particular = require('../../models/inventory/particular')
+const Size = require('../../models/inventory/size')
+
+// re-usable methods
 const delParticular = async id => {
   const particular = await Particular.findByIdAndDelete(id)
   const sizeId = particular.size
@@ -27,10 +28,7 @@ const delParticular = async id => {
 router.get('/', async (req, res) => {
   const products = await Product.find({}).populate({
     path: 'particulars',
-    populate: [
-      { path: 'size', select: 'name' }
-      // { path: 'orders' } // TODO uncomment when we add orders
-    ]
+    populate: [{ path: 'size', select: 'name' }]
   })
   res.json(products)
 })
@@ -109,10 +107,7 @@ router.post('/particular', async (req, res) => {
     { new: true }
   ).populate({
     path: 'particulars',
-    populate: [
-      { path: 'size', select: 'name' }
-      // { path: 'orders' } // TODO uncomment when we add orders
-    ]
+    populate: [{ path: 'size', select: 'name' }]
   })
   res.json(product)
 })
@@ -177,12 +172,12 @@ router.put('/particular/:id', async (req, res) => {
     )
     // add new size to particular
     particular.size = newSize._id
-    const editedParticular = await Particular.findByIdAndUpdate(id, particular, { new: true }).populate('size') //TODO populate orders
+    const editedParticular = await Particular.findByIdAndUpdate(id, particular, { new: true }).populate('size')
     return res.json(editedParticular)
   } else {
     // if the size name is the same
     console.log(particular)
-    const editedParticular = await Particular.findByIdAndUpdate(id, particular, { new: true }).populate('size') //TODO populate orders
+    const editedParticular = await Particular.findByIdAndUpdate(id, particular, { new: true }).populate('size')
     return res.json(editedParticular)
   }
 })
@@ -212,10 +207,7 @@ router.delete('/particular/:id', async (req, res) => {
     { new: true }
   ).populate({
     path: 'particulars',
-    populate: [
-      { path: 'size', select: 'name' }
-      // { path: 'orders' } // TODO uncomment when we add orders
-    ]
+    populate: [{ path: 'size', select: 'name' }]
   })
 
   res.json(product)

@@ -21,7 +21,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "multer-storage-cloudinary": "^4.0.0",
-    "stripe": "^8.131.1",
-    "uuid": "^8.3.2"
+    "short-uuid": "^4.1.0",
+    "stripe": "^8.131.1"
   }
 }
