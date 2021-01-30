@@ -29,4 +29,12 @@ router.put('/dispatch/:id', async (req, res) => {
   })
 })
 
+router.put('/details/:id', async (req, res) => {
+  const { id } = req.params
+  console.log('req', req.body)
+  const { details } = req.body
+  const order = await Order.findByIdAndUpdate(id, { otherDetails: details }, { new: true })
+  res.json(order)
+})
+
 module.exports = router
