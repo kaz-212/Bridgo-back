@@ -18,20 +18,8 @@ const orderSchema = new Schema({
     type: Number,
     required: true
   },
-  trackingNumber: {
-    type: String
-  },
   otherDetails: {
     type: String
-  },
-  returned: {
-    isReturned: {
-      type: Boolean,
-      default: false
-    },
-    details: {
-      type: String
-    }
   },
   items: [
     {
