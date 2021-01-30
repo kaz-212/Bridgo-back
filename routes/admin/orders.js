@@ -13,8 +13,13 @@ router.get('/', async (req, res) => {
       }
     ]
   })
-  console.log(orders[0].items)
   res.json(orders)
+})
+
+router.put('/dispatch/:id', async (req, res) => {
+  const { id } = req.params
+  const order = await Order.findByIdAndUpdate(id, { dispatched: true }, { new: true })
+  res.json(order)
 })
 
 module.exports = router

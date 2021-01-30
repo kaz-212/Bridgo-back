@@ -70,7 +70,8 @@ router.post('/process', async (req, res) => {
   // create order based on details from paymentId
   const order = new Order({
     email: email,
-    orderId: intent.metadata.orderId
+    orderId: intent.metadata.orderId,
+    amount: req.session.amount
   })
 
   for (const item of req.session.items) {
