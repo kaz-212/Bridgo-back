@@ -79,10 +79,11 @@ router.post('/process', async (req, res) => {
       item.particular._id,
       { $inc: { unitsRemaining: -item.qty, unitsSold: item.qty } },
       { new: true }
-    )
+    ).populate('product size')
     const orderItem = {
-      particular: particular._id,
-      qty: item.qty
+      qty: item.qty,
+      name: particular.product.name,
+      size: particular.size.name
     }
     order.items.push(orderItem)
   }

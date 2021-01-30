@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     populate: [
       {
         path: 'particular',
-        populate: [{ path: 'size', select: 'name' }]
+        populate: [{ path: 'size', select: 'name' }, { path: 'product' }]
       }
     ]
   })

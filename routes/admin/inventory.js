@@ -35,7 +35,6 @@ router.get('/', async (req, res) => {
 
 // add product
 router.post('/', upload.array('imgs'), async (req, res) => {
-  console.log('Joooo')
   const product = JSON.parse(req.body.product)
   const { name, type, description, details } = product
   const newProduct = new Product({ name, type, description })

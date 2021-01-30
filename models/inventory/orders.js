@@ -31,12 +31,14 @@ const orderSchema = new Schema({
   },
   items: [
     {
-      particular: {
-        type: Schema.Types.ObjectId,
-        ref: 'Particular'
+      name: {
+        type: String
       },
       qty: {
         type: Number
+      },
+      size: {
+        type: String
       }
     }
   ]
