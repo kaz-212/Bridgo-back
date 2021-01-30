@@ -16,10 +16,17 @@ router.get('/', async (req, res) => {
   res.json(orders)
 })
 
+// toggle value of dispatched
 router.put('/dispatch/:id', async (req, res) => {
   const { id } = req.params
-  const order = await Order.findByIdAndUpdate(id, { dispatched: true }, { new: true })
-  res.json(order)
+  await Order.findById(id, async function (err, doc) {
+    if (err) {
+      console.log(err)
+    }
+    doc.dispatched = !doc.dispatched
+    const order = await doc.save()
+    res.json(order)
+  })
 })
 
 module.exports = router
