@@ -18,14 +18,8 @@ const particularSchema = new Schema({
     required: true
   },
   shippingCost: {
-    international: {
-      type: Number,
-      required: true
-    },
-    local: {
-      type: Number,
-      required: true
-    }
+    type: Number,
+    required: true
   },
   unitsRemaining: {
     type: Number,
