@@ -51,9 +51,10 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   }
 
   for (const detail of details) {
+    console.log(detail)
     // find or create size
     const currentSize = await Size.findOneAndUpdate(
-      { name: detail.size }, // to lowercase in setter
+      { name: detail.size },
       { $push: { products: newProduct._id } },
       { upsert: true, new: true } // if size doesnt exist, creates new document
     )
@@ -61,9 +62,13 @@ router.post('/', upload.array('imgs'), async (req, res) => {
     // create new particular
     const particular = new Particular({
       product: newProduct._id,
-      price: parseFloat(detail.price),
-      unitsRemaining: parseInt(detail.qty),
-      size: currentSize
+      price: parseInt(Math.floor(detail.price * 100)),
+      unitsRemaining: parseInt(detail.unitsRemaining),
+      size: currentSize,
+      shippingCost: {
+        international: parseInt(Math.floor(detail.international * 100)),
+        local: parseInt(Math.floor(detail.local * 100))
+      }
     })
     // add particular to the products array
     const savedParticular = await particular.save()
@@ -85,19 +90,24 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   )
 })
 
+// Add new size to existing product
 router.post('/particular', async (req, res) => {
   const { productId, particular } = req.body
   const size = await Size.findOneAndUpdate(
-    { name: particular.size }, // to lowercase in setter
+    { name: particular.size },
     { $push: { products: productId } },
-    { upsert: true, new: true } // if size doesnt exist, creates new document
+    { upsert: true, new: true }
   )
   const newParticular = new Particular({
     product: productId,
-    price: parseFloat(particular.price),
+    price: parseInt(Math.floor(particular.price * 100)),
     unitsRemaining: particular.unitsRemaining,
     unitsSold: particular.unitsSold,
-    size: size._id
+    size: size._id,
+    shippingCost: {
+      international: parseInt(Math.floor(particular.international * 100)),
+      local: parseInt(Math.floor(particular.local * 100))
+    }
   })
   const savedParticular = await newParticular.save()
   const product = await Product.findByIdAndUpdate(
