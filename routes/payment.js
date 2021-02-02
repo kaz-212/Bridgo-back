@@ -8,16 +8,18 @@ const Particular = require('../models/inventory/particular')
 
 const calculatePrice = async items => {
   // calculate price based on particular id and quantity
-  let total = 0
+  let itemsCost = 0
+  let shippingCost = 0
   for (const item of items) {
     const particular = await Particular.findById(item.particular._id).populate('product')
-    total += Math.floor(particular.price * item.qty * 100)
+    itemsCost += Math.floor(particular.price * item.qty)
+    if (particular.shippingCost > shippingCost) shippingCost = particular.shippingCost
     if (item.qty > particular.unitsRemaining) {
       // if they have requested to buy more than is in stock, return an object rather than integer
-      return { name: item.product.name, size: item.particular.size, remaining: particular.unitsRemaining }
+      return { error: true, name: item.product.name, size: item.particular.size, remaining: particular.unitsRemaining }
     }
   }
-  return total
+  return { itemsCost, shippingCost }
 }
 
 // post('/') gets called when checkout page loads
@@ -31,7 +33,7 @@ router.post('/', async (req, res) => {
   req.session.items = items
   req.session.amount = amount
   // if there are enough left in stock
-  if (typeof amount != 'object') {
+  if (!amount.error) {
     if (req.cookies.intent) {
       // if we already have a payment intent created, update the amount of the old one every time checkout page loads
       const oldIntent = JSON.parse(req.cookies.intent)
@@ -39,16 +41,15 @@ router.post('/', async (req, res) => {
       const re = /[^_]*_[^_]*/
       const id = re.exec(oldIntent.client_secret)
       const intent = await stripe.paymentIntents.update(id[0], {
-        amount
+        amount: amount.itemsCost + amount.shippingCost
       })
-      // console.log(intent)
       res.json({ client_secret: intent.client_secret, amount })
     } else {
       // TODO if price == NAN => throw an error
       // first time payment intent created, assign it a unique order number
       const orderId = uuid.generate()
       const intent = await stripe.paymentIntents.create({
-        amount,
+        amount: amount.itemsCost + amount.shippingCost,
         currency: 'gbp',
         metadata: {
           orderId
@@ -64,14 +65,13 @@ router.post('/', async (req, res) => {
 // creates an order and adds items saved in the session to the order so know which items to send
 
 router.post('/process', async (req, res) => {
-  console.log(req.session)
   const { receipt_email: email } = req.body
   const intent = await stripe.paymentIntents.retrieve(req.body.id)
   // create order based on details from paymentId
   const order = new Order({
     email: email,
     orderId: intent.metadata.orderId,
-    amount: req.session.amount
+    amount: req.session.amount.itemsCost + req.session.amount.shippingCost
   })
 
   for (const item of req.session.items) {

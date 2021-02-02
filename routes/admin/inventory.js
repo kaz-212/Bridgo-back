@@ -65,10 +65,7 @@ router.post('/', upload.array('imgs'), async (req, res) => {
       price: parseInt(Math.floor(detail.price * 100)),
       unitsRemaining: parseInt(detail.unitsRemaining),
       size: currentSize,
-      shippingCost: {
-        international: parseInt(Math.floor(detail.international * 100)),
-        local: parseInt(Math.floor(detail.local * 100))
-      }
+      shippingCost: parseInt(Math.floor(detail.shippingCost * 100))
     })
     // add particular to the products array
     const savedParticular = await particular.save()
@@ -104,10 +101,7 @@ router.post('/particular', async (req, res) => {
     unitsRemaining: particular.unitsRemaining,
     unitsSold: particular.unitsSold,
     size: size._id,
-    shippingCost: {
-      international: parseInt(Math.floor(particular.international * 100)),
-      local: parseInt(Math.floor(particular.local * 100))
-    }
+    shippingCost: parseInt(Math.floor(particular.shippingCost * 100))
   })
   const savedParticular = await newParticular.save()
   const product = await Product.findByIdAndUpdate(
@@ -157,6 +151,7 @@ router.put('/particular/:id', async (req, res) => {
   const { id } = req.params
   const particular = req.body
   const oldParticular = await Particular.findById(id).populate('size')
+
   // check if size has changed
   if (particular.size.name !== oldParticular.size.name) {
     // rm product from size array and delete if necessary
@@ -173,12 +168,14 @@ router.put('/particular/:id', async (req, res) => {
         }
       }
     )
+
     // check if new size exists and if not, add new size
     const newSize = await Size.findOneAndUpdate(
       { name: particular.size.name }, // to lowercase in setter
       { $push: { products: particular.product } },
       { upsert: true, new: true } // if size doesnt exist, creates new document
     )
+
     // add new size to particular
     particular.size = newSize._id
     const editedParticular = await Particular.findByIdAndUpdate(id, particular, { new: true }).populate('size')
