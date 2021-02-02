@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const Project = require('../models/projects')
+const Project = require('../models/Projects/projects')
 const multer = require('multer')
 const { storage, cloudinary } = require('../cloudinary')
 const upload = multer({ storage })

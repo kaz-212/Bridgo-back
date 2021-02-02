@@ -3,12 +3,8 @@ const Schema = mongoose.Schema
 
 const opts = { toJSON: { virtuals: true } }
 
-const pieceSchema = new Schema(
+const imgSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: true
-    },
     isMain: {
       type: Boolean,
       required: true
@@ -17,31 +13,11 @@ const pieceSchema = new Schema(
       type: String,
       required: true
     },
-    description: {
-      type: String,
-      required: true
-    },
-    size: {
-      type: String,
-      required: true
-    },
-    materials: {
-      type: String,
-      required: true
-    },
-    year: {
-      type: Number,
-      required: true
-    },
-    index: {
-      type: Number,
-      required: true,
-      unique: true
-    },
-    showInProj: {
-      type: Boolean,
-      default: true
-    },
+    // index: {
+    //   type: Number,
+    //   required: true,
+    //   unique: true
+    // },
     filename: {
       type: String,
       unique: true
@@ -50,7 +26,7 @@ const pieceSchema = new Schema(
   opts
 )
 
-pieceSchema.virtual('thumbnail').get(function () {
+imgSchema.virtual('thumbnail').get(function () {
   return this.imgURL.replace('/upload', '/upload/w_250')
 })
 
@@ -67,15 +43,19 @@ const projectSchema = new Schema({
     type: Number,
     required: true
   },
-  index: {
-    type: Number,
-    unique: true
+  materials: {
+    type: String,
+    required: true
   },
+  // index: {
+  //   type: Number,
+  //   unique: true
+  // },
   onShow: {
     type: Boolean,
     default: true
   },
-  pieces: [pieceSchema]
+  images: [imgSchema]
 })
 
 module.exports = mongoose.model('Project', projectSchema)
