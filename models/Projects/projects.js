@@ -7,7 +7,7 @@ const imgSchema = new Schema(
   {
     isMain: {
       type: Boolean,
-      required: true
+      default: false
     },
     imgURL: {
       type: String,
@@ -40,7 +40,7 @@ const projectSchema = new Schema({
     required: true
   },
   year: {
-    type: Number,
+    type: String,
     required: true
   },
   materials: {
@@ -55,7 +55,11 @@ const projectSchema = new Schema({
     type: Boolean,
     default: true
   },
-  images: [imgSchema]
+  images: [imgSchema],
+  theme: {
+    type: Schema.Types.ObjectId,
+    ref: 'Theme'
+  }
 })
 
 module.exports = mongoose.model('Project', projectSchema)

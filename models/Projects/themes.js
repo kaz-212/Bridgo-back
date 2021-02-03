@@ -10,10 +10,12 @@ const themeSchema = new Schema({
     type: String
   },
   years: String,
-  projects: {
-    type: Schema.Types.ObjectId,
-    ref: 'Project'
-  }
+  projects: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Project'
+    }
+  ]
 })
 
 module.exports = mongoose.model('Theme', themeSchema)
