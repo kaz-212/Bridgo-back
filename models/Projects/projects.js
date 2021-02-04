@@ -47,10 +47,9 @@ const projectSchema = new Schema({
     type: String,
     required: true
   },
-  // index: {
-  //   type: Number,
-  //   unique: true
-  // },
+  index: {
+    type: Number
+  },
   onShow: {
     type: Boolean,
     default: true
