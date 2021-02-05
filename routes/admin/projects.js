@@ -8,22 +8,34 @@ const upload = multer({ storage })
 
 // methods
 
-// return the theme with projects ordered by index
-const orderProjects = theme => {
-  theme.projects.sort((a, b) => {
-    return a.index - b.index
-  })
+// callback tto sort by ascending value of index
+const sortAssending = (a, b) => {
+  return a.index - b.index
+}
+
+// sort the projects and images for one theme by index
+const sortOne = theme => {
+  theme.projects.sort(sortAssending)
+  for (let i = 0; i < theme.projects.length; i++) {
+    theme.projects[i].images.sort(sortAssending)
+  }
   return theme
+}
+
+// sort the projects and images for many themes by index
+const sortMany = themes => {
+  for (let i = 0; i < themes.length; i++) {
+    sortOne(themes[i])
+  }
+  return themes
 }
 
 // routes
 
 router.get('/theme', async (req, res) => {
   const themes = await Theme.find({}).populate('projects')
-  for (let i = 0; i < themes.length; i++) {
-    themes[i] = orderProjects(themes[i])
-  }
-  res.json(themes)
+  const sortedThemes = sortMany(themes)
+  res.json(sortedThemes)
 })
 
 router.post('/theme', async (req, res) => {
@@ -41,9 +53,7 @@ router.post('/project', upload.array('imgs'), async (req, res) => {
     let image = {}
     image.imgURL = req.files[i].path
     image.filename = req.files[i].filename
-    if (i === 0) {
-      image.isMain = true // default is false
-    }
+    image.index = i
     newProject.images.push(image)
   }
   await newProject.save()
@@ -52,8 +62,8 @@ router.post('/project', upload.array('imgs'), async (req, res) => {
     { $push: { projects: newProject._id } },
     { new: true }
   ).populate('projects')
-  const orderedTheme = orderProjects(theme)
-  res.json(orderedTheme)
+  const sortedTheme = sortOne(theme)
+  res.json(sortedTheme)
 })
 
 router.put('/project', upload.array('imgs'), async (req, res) => {
@@ -63,9 +73,8 @@ router.put('/project', upload.array('imgs'), async (req, res) => {
     let image = {}
     image.imgURL = req.files[i].path
     image.filename = req.files[i].filename
-    if (i === 0) {
-      image.isMain = true // default is false
-    }
+    // find the index of last thing in project.images and increment it for each image
+    image.index = project.images[project.images.length - 1].index + 1 + i
     project.images.push(image)
   }
   for (filename of filenames) {
@@ -79,12 +88,12 @@ router.put('/project', upload.array('imgs'), async (req, res) => {
       { $push: { projects: project._id } },
       { new: true }
     ).populate('projects')
-    const orderedTheme = orderProjects(theme)
-    res.json(orderedTheme)
+    const sortedTheme = sortOne(theme)
+    res.json(sortedTheme)
   } else {
     const theme = await Theme.findById(project.theme).populate('projects')
-    const orderedTheme = orderProjects(theme)
-    res.json(orderedTheme)
+    const sortedTheme = sortOne(theme)
+    res.json(sortedTheme)
   }
 })
 
@@ -95,8 +104,8 @@ router.patch('/project', async (req, res) => {
     await Project.findByIdAndUpdate(project._id, { index: project.index })
   }
   const theme = await Theme.findById(projects[0].theme).populate('projects')
-  const orderedTheme = orderProjects(theme)
-  res.json(orderedTheme)
+  const sortedTheme = sortOne(theme)
+  res.json(sortedTheme)
 })
 
 module.exports = router

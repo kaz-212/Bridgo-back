@@ -5,19 +5,13 @@ const opts = { toJSON: { virtuals: true } }
 
 const imgSchema = new Schema(
   {
-    isMain: {
-      type: Boolean,
-      default: false
-    },
     imgURL: {
       type: String,
       required: true
     },
-    // index: {
-    //   type: Number,
-    //   required: true,
-    //   unique: true
-    // },
+    index: {
+      type: Number
+    },
     filename: {
       type: String,
       unique: true
