@@ -22,7 +22,6 @@ const sortOne = theme => {
   return theme
 }
 
-// sort the projects and images for many themes by index
 const sortMany = themes => {
   for (let i = 0; i < themes.length; i++) {
     sortOne(themes[i])
@@ -36,6 +35,20 @@ router.get('/theme', async (req, res) => {
   const themes = await Theme.find({}).populate('projects')
   const sortedThemes = sortMany(themes)
   res.json(sortedThemes)
+})
+
+// router.get('/theme/:id', async (req, res) => {
+//   const { id } = req.params
+//   const theme = await Theme.findById(id).populate('projects')
+//   console.log(theme)
+//   const sortedTheme = sortOne(theme)
+//   res.json(sortedTheme)
+// })
+
+router.get('/project/:id', async (req, res) => {
+  const { id } = req.params
+  const project = await Project.findById(id)
+  res.json(project)
 })
 
 router.post('/theme', async (req, res) => {
@@ -82,18 +95,23 @@ router.put('/project', upload.array('imgs'), async (req, res) => {
   }
   const oldProject = await Project.findByIdAndUpdate(project._id, project) // returns pre-updated proj.
   if (oldProject.theme !== project.theme) {
-    await Theme.findByIdAndUpdate(oldProject.theme, { $pull: { projects: project._id } })
+    const oldTheme = await Theme.findByIdAndUpdate(
+      oldProject.theme,
+      { $pull: { projects: project._id } },
+      { new: true }
+    ).populate('projects')
     const theme = await Theme.findByIdAndUpdate(
       project.theme,
       { $push: { projects: project._id } },
       { new: true }
     ).populate('projects')
+    const sortedOldTheme = sortOne(oldTheme)
     const sortedTheme = sortOne(theme)
-    res.json(sortedTheme)
+    res.json([sortedTheme, sortedOldTheme])
   } else {
     const theme = await Theme.findById(project.theme).populate('projects')
     const sortedTheme = sortOne(theme)
-    res.json(sortedTheme)
+    res.json([sortedTheme])
   }
 })
 
