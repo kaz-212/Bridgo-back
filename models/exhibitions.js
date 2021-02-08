@@ -13,6 +13,9 @@ const imageSchema = new Schema(
       type: String,
       unique: true,
       required: true
+    },
+    index: {
+      type: Number
     }
   },
   opts
@@ -27,15 +30,20 @@ const exhibitionSchema = new Schema({
     type: String,
     required: true
   },
+  index: {
+    type: Number
+  },
   description: {
     type: String,
     required: true
   },
   date: {
-    type: String
+    type: String,
+    required: true
   },
   location: {
-    type: String
+    type: String,
+    required: true
   },
   isUpcoming: {
     type: Boolean,
@@ -45,6 +53,7 @@ const exhibitionSchema = new Schema({
     type: Boolean,
     default: true
   },
+  // TODO order exhibitions by index
   index: {
     type: Number,
     unique: true,
