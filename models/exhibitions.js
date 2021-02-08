@@ -53,18 +53,13 @@ const exhibitionSchema = new Schema({
     type: Boolean,
     default: true
   },
-  // TODO order exhibitions by index
-  index: {
-    type: Number,
-    unique: true,
-    required: true
-  },
   links: [
     {
       name: String,
       URL: String
     }
   ],
+  // TODO make images required
   images: [imageSchema]
 })
 
