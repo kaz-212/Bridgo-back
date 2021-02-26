@@ -59,7 +59,6 @@ const exhibitionSchema = new Schema({
       URL: String
     }
   ],
-  // TODO make images required
   images: [imageSchema]
 })
 

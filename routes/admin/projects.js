@@ -64,7 +64,7 @@ router.post('/project', upload.array('imgs'), async (req, res) => {
 
   for (let i = 0; i < req.files.length; i++) {
     let image = {}
-    image.imgURL = req.files[i].path
+    image.imgURL = req.files[i].path.replace('/upload', '/upload/w_auto,q_auto')
     image.filename = req.files[i].filename
     image.index = i
     newProject.images.push(image)

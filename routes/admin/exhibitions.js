@@ -40,7 +40,7 @@ router.post('/', upload.array('imgs'), async (req, res) => {
   const newExhibition = new Exhibition(exhibition)
   for (const img of req.files) {
     let image = {}
-    image.imgURL = img.path
+    image.imgURL = img.path.replace('/upload', '/upload/w_auto,q_auto')
     image.filename = img.filename
     newExhibition.images.push(image)
   }
@@ -67,7 +67,7 @@ router.put('/:id', upload.array('imgs'), async (req, res) => {
   const exhibition = JSON.parse(req.body.exhibition)
   for (const img of req.files) {
     let image = {}
-    image.imgURL = img.path
+    image.imgURL = img.path.replace('/upload', '/upload/w_auto,q_auto')
     image.filename = img.filename
     exhibition.images.push(image)
   }
