@@ -13,7 +13,8 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const morgan = require('morgan')
 const history = require('connect-history-api-fallback')
-var session = require('express-session')
+const session = require('express-session')
+const MongoStore = require('connect-mongo').default
 
 const admin = require('./routes/admin')
 const project = require('./routes/projects.js')
@@ -53,7 +54,17 @@ app.use(cookieParser(process.env.COOKIE_SECRET_KEY))
 // express-session
 
 // TODO change session storage to propper storage
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  touchAfter: 24 * 60 * 60
+})
+
+store.on('error', e => {
+  console.log('SESSION STORE ERROR', e)
+})
+
 const sessionConfig = {
+  store,
   name: 'order',
   secret: process.env.SESSION_SECRET_KEY,
   resave: false,
