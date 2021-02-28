@@ -31,22 +31,21 @@ imgSchema.virtual('thumbnail').get(function () {
 const productSchema = new Schema({
   name: {
     type: String,
-    required: true,
+    required: [true, 'Name field cannot be blank'],
     unique: true
   },
   description: {
     type: String,
-    required: true
+    required: [true, 'Need to add a descriptopn']
   },
   images: [imgSchema],
   type: {
     type: String,
     enum: ['print', 'piece', 'other'],
-    required: true
+    required: [true, 'Need to select a type pls']
   },
   onShow: {
     type: Boolean,
-    required: true,
     default: true
   },
   index: {

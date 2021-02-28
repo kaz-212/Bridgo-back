@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const themeSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: [true, 'Need to add a theme name']
   },
   description: {
     type: String

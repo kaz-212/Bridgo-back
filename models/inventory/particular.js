@@ -11,19 +11,19 @@ const particularSchema = new Schema({
   size: {
     type: Schema.Types.ObjectId,
     ref: 'Size',
-    required: true
+    required: [true, 'Need to add a size']
   },
   price: {
     type: Number,
-    required: true
+    required: [true, 'Need to add a price']
   },
   shippingCost: {
     type: Number,
-    required: true
+    required: [true, 'Please add the cost of shipping']
   },
   unitsRemaining: {
     type: Number,
-    required: true,
+    required: [true, 'Please add a quantity'],
     min: 0
   },
   index: {

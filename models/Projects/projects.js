@@ -27,19 +27,19 @@ imgSchema.virtual('thumbnail').get(function () {
 const projectSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: [true, "You're gonna need a name for this one"]
   },
   description: {
     type: String,
-    required: true
+    required: [true, 'You need to add a description']
   },
   year: {
     type: String,
-    required: true
+    required: [true, 'You need to add a Year']
   },
   materials: {
     type: String,
-    required: true
+    required: [true, 'You need to say what materials you used']
   },
   index: {
     type: Number

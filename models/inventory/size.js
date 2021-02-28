@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 const sizeSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: [true, 'Need to add a size name']
   },
   products: [
     {
