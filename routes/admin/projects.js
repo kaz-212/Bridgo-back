@@ -150,4 +150,17 @@ router.patch(
   })
 )
 
+router.delete(
+  '/:id',
+  catchAsync(async (req, res) => {
+    const { id } = req.params
+    const project = await Project.findByIdAndDelete(id)
+    console.log(project.images)
+    for (const img of project.images) {
+      await cloudinary.uploader.destroy(img.filename)
+    }
+    res.status(200).json(project)
+  })
+)
+
 module.exports = router
