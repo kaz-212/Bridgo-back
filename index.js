@@ -53,7 +53,6 @@ app.use(cookieParser(process.env.COOKIE_SECRET_KEY))
 
 // express-session
 
-// TODO change session storage to propper storage
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   touchAfter: 24 * 60 * 60
@@ -70,7 +69,7 @@ const sessionConfig = {
   resave: false,
   saveUninitialized: true,
   cookie: {
-    httpOnly: true,
+    httpOnly: true, // TODO same site
     maxAge: 1000 * 60 * 60 * 7, // 7 hrs
     secure
   }
@@ -90,6 +89,12 @@ app.use('/api/projects', project)
 app.use('/api/exhibitions', exhibition)
 app.use('/api/inventory', inventory)
 app.use('/api/payment-intent', payment)
+
+// ======== ERROR ========
+app.use((err, req, res, next) => {
+  const { status = 500, message = 'Something went wrong' } = err
+  res.status(status).er(message)
+})
 
 const port = process.env.PORT || 5000
 
