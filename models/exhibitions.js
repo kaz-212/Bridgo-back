@@ -28,22 +28,22 @@ imageSchema.virtual('thumbnail').get(function () {
 const exhibitionSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: [true, 'You gotta give it a name!']
   },
   index: {
     type: Number
   },
   description: {
     type: String,
-    required: true
+    required: [true, 'You gotta give a description!']
   },
   date: {
     type: String,
-    required: true
+    required: [true, ' You gotta tell us when it is!']
   },
   location: {
     type: String,
-    required: true
+    required: [true, 'You gotta tell us where it is!']
   },
   isUpcoming: {
     type: Boolean,
