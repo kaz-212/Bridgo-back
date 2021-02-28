@@ -93,7 +93,7 @@ app.use('/api/payment-intent', payment)
 // ======== ERROR ========
 app.use((err, req, res, next) => {
   const { status = 500, message = 'Something went wrong' } = err
-  res.status(status).er(message)
+  res.status(status).send(message)
 })
 
 const port = process.env.PORT || 5000
