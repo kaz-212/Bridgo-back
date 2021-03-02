@@ -1,9 +1,9 @@
-let secure
+let cookieSecure
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
-  secure = false
+  cookieSecure = false
 } else {
-  secure = true
+  cookieSecure = true
 }
 const express = require('express')
 const app = express()
@@ -13,7 +13,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const morgan = require('morgan')
 const history = require('connect-history-api-fallback')
-var secure = require('express-force-https')
+const secure = require('express-force-https')
 const session = require('express-session')
 const MongoStore = require('connect-mongo').default
 
@@ -72,7 +72,7 @@ const sessionConfig = {
   cookie: {
     httpOnly: true, // TODO same site
     maxAge: 1000 * 60 * 60 * 7, // 7 hrs
-    secure
+    cookieSecure
   }
 }
 
