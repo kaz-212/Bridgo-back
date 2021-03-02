@@ -83,6 +83,14 @@ app.use(express.json())
 app.use(history())
 app.use(morgan('dev'))
 
+app.use(function (req, res, next) {
+  if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+    return next()
+  } else {
+    return res.redirect('https://' + req.headers.host + req.url)
+  }
+})
+
 // ======== ROUTES ========
 
 app.use('/api/admin', admin)
