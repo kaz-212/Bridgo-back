@@ -13,6 +13,7 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const morgan = require('morgan')
 const history = require('connect-history-api-fallback')
+var secure = require('express-force-https')
 const session = require('express-session')
 const MongoStore = require('connect-mongo').default
 
@@ -81,15 +82,16 @@ app.use(session(sessionConfig))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(history())
+app.use(secure) // forces https
 app.use(morgan('dev'))
 
-app.use(function (req, res, next) {
-  if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
-    return next()
-  } else {
-    return res.redirect('https://' + req.headers.host + req.url)
-  }
-})
+// app.use(function (req, res, next) {
+//   if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+//     return next()
+//   } else {
+//     return res.redirect('https://' + req.headers.host + req.url)
+//   }
+// })
 
 // ======== ROUTES ========
 
