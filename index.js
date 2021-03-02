@@ -84,6 +84,15 @@ app.use(history())
 app.use(morgan('dev'))
 
 // ======== ROUTES ========
+
+// Ensure always served over https
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https') res.redirect(`https://${req.header('host')}${req.url}`)
+    else next()
+  })
+}
+
 app.use('/api/admin', admin)
 app.use('/api/projects', project)
 app.use('/api/exhibitions', exhibition)
