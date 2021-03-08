@@ -10,7 +10,6 @@ const app = express()
 
 const mongoose = require('mongoose')
 const cookieParser = require('cookie-parser')
-const cors = require('cors')
 const morgan = require('morgan')
 const history = require('connect-history-api-fallback')
 const session = require('express-session')
@@ -40,13 +39,6 @@ db.once('open', () => {
 })
 
 // ======== MIDDLEWARE ========
-// cors
-const corsOpts = {
-  origin: process.env.CORS_ORIGIN,
-  credentials: true,
-  exposedHeaders: ['set-cookie']
-}
-app.use(cors(corsOpts))
 
 // cookie parser
 app.use(cookieParser(process.env.COOKIE_SECRET_KEY))
@@ -77,13 +69,25 @@ const sessionConfig = {
 
 app.use(session(sessionConfig))
 
-app.use(function (req, res, next) {
-  if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
-    return next()
-  } else {
-    return res.redirect('https://' + req.headers.host + req.url)
+// Https if live, cors if in dev mode
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(function (req, res, next) {
+    if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+      return next()
+    } else {
+      return res.redirect('https://' + req.headers.host + req.url)
+    }
+  })
+} else {
+  const cors = require('cors')
+  const corsOpts = {
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+    exposedHeaders: ['set-cookie']
   }
-})
+  app.use(cors(corsOpts))
+}
 
 // other middleware
 app.use(express.urlencoded({ extended: true }))
