@@ -39,6 +39,15 @@ router.get(
   })
 )
 
+router.get(
+  '/:id',
+  catchAsync(async (req, res) => {
+    const { id } = req.params
+    const exhibitions = await Exhibition.findById(id)
+    res.status(200).json(exhibitions)
+  })
+)
+
 router.post(
   '/',
   upload.array('imgs'),
