@@ -22,6 +22,20 @@ const inventory = require('./routes/inventory.js');
 const payment = require('./routes/payment.js');
 const login = require('./routes/login.js');
 
+// ======== Create new user ========
+
+// const User = require('./models/user.js');
+// const bcrypt = require('bcrypt');
+
+// const newUser = async (username, password) => {
+//   const hashedPassword = await bcrypt.hash(password, 12);
+//   const user = new User({ username, password: hashedPassword });
+//   await user.save();
+//   console.log('SUCCESS');
+// };
+
+// newUser('test', 'test');
+
 // ======== MONGOOSE ========
 
 const dbUrl = process.env.MONGO_URL;
@@ -107,8 +121,8 @@ app.use('/api/login', login);
 
 // ======== ERROR ========
 app.use((err, req, res, next) => {
-  const { status = 500, message = 'Something went wrong' } = err;
-  res.status(status).send(message);
+  const { statusCode = 500, message = 'Something went wrong' } = err;
+  res.status(statusCode).send(message);
 });
 
 // Handle production
